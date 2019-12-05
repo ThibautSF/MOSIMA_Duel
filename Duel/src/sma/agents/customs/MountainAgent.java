@@ -1,5 +1,9 @@
 package sma.agents.customs;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
 
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
@@ -120,5 +124,20 @@ public class MountainAgent extends FinalAgent {
 		}
 	}
 	
-	
+	public void saveCSV(String ressourceFolderPath, String fileName, String content) {
+		//In case the user write wrong separator
+		ressourceFolderPath = ressourceFolderPath.replaceAll("(\\\\+|/+)", Matcher.quoteReplacement(File.separator));
+		if(!(ressourceFolderPath.lastIndexOf(File.separator)==ressourceFolderPath.length()-1)) ressourceFolderPath+=File.separator;
+		
+		try{
+		    PrintWriter writer = new PrintWriter(ressourceFolderPath+fileName+".csv", "UTF-8");
+		    writer.println(content);
+		    writer.close();
+		    System.out.println("Execution result saved in /ressources/simus/");
+		} catch (IOException e) {
+		  System.out.println(e);
+		  System.out.println("Experiment saving failed");
+		}
+		
+	}
 }

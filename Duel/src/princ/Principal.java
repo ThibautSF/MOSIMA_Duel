@@ -121,11 +121,9 @@ public class Principal {
 			e.printStackTrace();
 		}
 		
-		/*
+		/**
 		agentName="Dummy";
 		try {
-
-
 			Object[] objtab=new Object[]{env, false};//used to give informations to the agent
 			AgentController	ag=c.createNewAgent(agentName,FinalAgent.class.getName(),objtab);
 			agentList.add(ag);
@@ -133,7 +131,7 @@ public class Principal {
 		} catch (StaleProxyException e) {
 			e.printStackTrace();
 		}
-		*/
+		/**/
 		
 		
 		

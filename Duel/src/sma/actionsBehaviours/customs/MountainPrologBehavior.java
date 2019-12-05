@@ -15,6 +15,9 @@ import sma.AbstractAgent;
 import sma.InterestPoint;
 import sma.actionsBehaviours.*;
 import sma.agents.FinalAgent;
+
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +26,7 @@ import java.util.Random;
 public class MountainPrologBehavior extends TickerBehaviour {
 	private static final long serialVersionUID = 5739600674796316846L;
 	private static final int HEIGHT_EXPLORE_RATE = 80;
+	private static final int EXPLORE_IDLE_MIN = 5; //Minimal time (in seconds) to stay in the same exploration behavior
 
 	public static FinalAgent agent;
 	public static Class<?> exploreBehavior;
@@ -63,6 +67,7 @@ public class MountainPrologBehavior extends TickerBehaviour {
 						int time = (int) Math.max(0, Math.min(Integer.MAX_VALUE,(System.currentTimeMillis() - dateLastChooseExploration)));
 						//System.out.println(time);
 						terms.add(time);
+						terms.add(EXPLORE_IDLE_MIN);
 						/*
 						terms.add(((ExploreBehavior.prlNextOffend)?sit.offSize:sit.defSize ));
 						terms.add(InterestPoint.INFLUENCE_ZONE);
@@ -191,5 +196,4 @@ public class MountainPrologBehavior extends TickerBehaviour {
 		//System.out.println("retreat");
 		//nextBehavior = RetreatBehavior.class;
 	}
-
 }
