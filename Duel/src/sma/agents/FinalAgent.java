@@ -94,7 +94,7 @@ public class FinalAgent extends AbstractAgent{
 		}
 	}
 	
-	void deploiment(){
+	protected void deploiment(){
 		final Object[] args = getArguments();
 		if(args[0]!=null && args[1]!=null){
 			
@@ -102,7 +102,6 @@ public class FinalAgent extends AbstractAgent{
 			useProlog = ((boolean)args[1]);
 			
 			if(useProlog){
-				
 				addBehaviour(new PrologBehavior(this,PERIOD));
 			}else{
 				addBehaviour(new DumbBehavior(this, PERIOD));

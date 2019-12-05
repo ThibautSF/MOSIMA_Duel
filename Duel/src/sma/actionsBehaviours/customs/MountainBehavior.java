@@ -57,42 +57,13 @@ public class MountainBehavior extends TickerBehaviour {
 
 	
 	protected void onTick(){
-		if (target == null && !setTarget()){
+		if (!setTarget()){
 			randomMove();
 			return;
 		}
 		
-		if (agent.getCurrentPosition().distance(target) < AbstractAgent.NEIGHBORHOOD_DISTANCE) {
-			if (!setTarget()) {
-				randomMove();
-				return;
-			}
-		}
-		
-		agent.goTo(target);
-		
-		/*
-		if (target == null && !setTarget()){ 
-			randomMove();
-			return;
-		}
-		
-		if (agent.getCurrentPosition().distance(target) < AbstractAgent.NEIGHBORHOOD_DISTANCE){
-			Vector3f nei = findInterestingNeighbor();
-			if(nei != null && agent.getCurrentPosition().distance(nei) < AbstractAgent.NEIGHBORHOOD_DISTANCE / 2f){
-				//System.out.println("Better Neighbor");
-				target = nei;
-				agent.moveTo(target);
-			}else{
-				addInterestPoint();
-				target = null;
-				//targetType = null;
-			}
-		}
-		*/
+		agent.moveTo(target);
 	}
-	
-	
 	
 	void addInterestPoint(){
 		if(targetType == Type.Offensive){
@@ -102,35 +73,18 @@ public class MountainBehavior extends TickerBehaviour {
 		}
 	}
 	
-	
-	Vector3f findInterestingNeighbor(){
-		if(targetType == Type.Offensive){
-			return findHighestNeighbor();
-		}else{
-			return findLowestNeighbor();
-		}
-	}
-
-	
-	Vector3f findHighestNeighbor(){
-		ArrayList<Vector3f> points = agent.sphereCast(agent.getSpatial(), AbstractAgent.NEIGHBORHOOD_DISTANCE, AbstractAgent.CLOSE_PRECISION, AbstractAgent.VISION_ANGLE);
-		return getHighest(points);
-	}
-	
-	Vector3f findLowestNeighbor(){
-		ArrayList<Vector3f> points = agent.sphereCast(agent.getSpatial(), AbstractAgent.NEIGHBORHOOD_DISTANCE, AbstractAgent.CLOSE_PRECISION, AbstractAgent.VISION_ANGLE);
-		return getLowest(points);
-	}
-	
 	boolean setTarget() {
 		ArrayList<Vector3f> aroundPoints = agent.sphereCast(agent.getSpatial(), AbstractAgent.VISION_DISTANCE, AbstractAgent.FAR_PRECISION, VISION_ANGLE);
+		
+		if(target != null)
+			aroundPoints.add(0, target);
 		
 		Vector3f heighestPoint = getHighest(aroundPoints);
 		
 		target = heighestPoint;
 		
 		if(target != null) {
-			agent.goTo(target);
+			//agent.goTo(target);
 			//targetType = t;
 			agent.lastAction = (targetType==Type.Offensive)?Situation.EXPLORE_OFF:Situation.EXPLORE_DEF;
 		}
@@ -150,68 +104,6 @@ public class MountainBehavior extends TickerBehaviour {
 		}
 		return best;
 	}
-	
-	Vector3f getLowest(ArrayList<Vector3f> points){
-		float minHeight = 256;
-		Vector3f best = null;
-		
-		for(Vector3f v3 : points){
-			if (v3.getY() < minHeight){
-				best = v3;
-				minHeight = v3.getY();
-			}
-		}
-		return best;
-	}
-	
-	
-	Vector3f findOffensiveTarget(){
-		ArrayList<Vector3f> points = agent.sphereCast(agent.getSpatial(), AbstractAgent.VISION_DISTANCE, AbstractAgent.FAR_PRECISION, AbstractAgent.VISION_ANGLE);
-		
-		ArrayList<Vector3f> toRemove = new ArrayList<>();
-		
-		for(InterestPoint intPoint : agent.offPoints)
-			for(Vector3f point : points)
-				if(intPoint.isInfluenceZone(point, Type.Offensive))
-					toRemove.add(point);
-		
-		for (Vector3f v3 : toRemove){ points.remove(v3); }
-		
-		return getHighest(points);
-	}
-	
-	
-	Vector3f findDefensiveTarget(){
-		ArrayList<Vector3f> points = agent.sphereCast(agent.getSpatial(), AbstractAgent.VISION_DISTANCE, AbstractAgent.FAR_PRECISION, AbstractAgent.VISION_ANGLE);
-		
-		ArrayList<Vector3f> toRemove = new ArrayList<>();
-		
-		for(InterestPoint intPoint : agent.defPoints)
-			for(Vector3f point : points)
-				if(intPoint.isInfluenceZone(point, Type.Defensive))
-					toRemove.add(point);
-				
-		
-		for (Vector3f v3 : toRemove){ points.remove(v3); }
-		
-		return getLowest(points);
-	}
-	
-	
-	Type getNextTargetType(){
-		
-		if (agent.useProlog){
-			String query = "explore_points("+agent.offPoints.size()+","+agent.defPoints.size()+")";
-			if (Query.hasSolution(query)) {
-				prlNextOffend = false;
-			}else{
-				prlNextOffend = true;
-			}
-		}
-		
-		return (prlNextOffend)?Type.Offensive : Type.Defensive;
-	}
-	
 	
 	void randomMove(){
 		long time = System.currentTimeMillis();

@@ -37,6 +37,7 @@ public class MountainPrologBehavior extends TickerBehaviour {
 	public MountainPrologBehavior(Agent a, long period) {
 		super(a, period);
 		agent = (FinalAgent)((AbstractAgent)a);
+		exploreBehavior = DEFAULT_EXPLORE_BEHAVIOR;
 	}
 
 
@@ -60,11 +61,13 @@ public class MountainPrologBehavior extends TickerBehaviour {
 					if (b.equals("explore")) {
 						terms.add(sit.timeSinceLastShot);
 						int time = (int) Math.max(0, Math.min(Integer.MAX_VALUE,(System.currentTimeMillis() - dateLastChooseExploration)));
-						System.out.println(time);
+						//System.out.println(time);
 						terms.add(time);
-						terms.add(((MountainBehavior.prlNextOffend)?sit.offSize:sit.defSize ));
+						/*
+						terms.add(((ExploreBehavior.prlNextOffend)?sit.offSize:sit.defSize ));
 						terms.add(InterestPoint.INFLUENCE_ZONE);
 						terms.add(NewEnv.MAX_DISTANCE);
+						*/
 					}
 					else if (b.equals("hunt")) {
 						terms.add(sit.life);
@@ -115,9 +118,9 @@ public class MountainPrologBehavior extends TickerBehaviour {
 			agent.currentBehavior = ex;
 
 		}else if (nextBehavior == MountainBehavior.class){
-			MountainBehavior ex = new MountainBehavior(agent, FinalAgent.PERIOD);
-			agent.addBehaviour(ex);
-			agent.currentBehavior = ex;
+			MountainBehavior m = new MountainBehavior(agent, FinalAgent.PERIOD);
+			agent.addBehaviour(m);
+			agent.currentBehavior = m;
 
 		}else if(nextBehavior == HuntBehavior.class){
 			HuntBehavior h = new HuntBehavior(agent, FinalAgent.PERIOD);
@@ -152,19 +155,21 @@ public class MountainPrologBehavior extends TickerBehaviour {
 	}
 
 	public static void executeExplore() {
-		//System.out.println("explore");
+		System.out.println("explore");
 		nextBehavior = ExploreBehavior.class;
 		dateLastChooseExploration = System.currentTimeMillis();
 		exploreBehavior = nextBehavior;
 	}
 	
 	public static void executeMountain() {
+		System.out.println("mountain");
 		nextBehavior = MountainBehavior.class;
 		dateLastChooseExploration = System.currentTimeMillis();
 		exploreBehavior = nextBehavior;
 	}
 	
 	public static void executeLastExplore() {
+		//System.out.println("Execute last " + exploreBehavior);
 		if (exploreBehavior == null)
 			nextBehavior = DEFAULT_EXPLORE_BEHAVIOR;
 		else

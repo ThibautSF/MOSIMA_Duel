@@ -57,7 +57,6 @@ public class ExploreBehavior extends TickerBehaviour {
 
 	
 	protected void onTick(){
-		
 		if (target == null && !setTarget()){ 
 			randomMove();
 			return;

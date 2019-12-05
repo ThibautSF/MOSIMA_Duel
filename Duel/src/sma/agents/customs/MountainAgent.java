@@ -96,7 +96,7 @@ public class MountainAgent extends FinalAgent {
 		}
 	}
 	
-	void deploiment(){
+	protected void deploiment(){
 		final Object[] args = getArguments();
 		if(args[0]!=null && args[1]!=null){
 			

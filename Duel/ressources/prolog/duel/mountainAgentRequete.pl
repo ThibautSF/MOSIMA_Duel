@@ -20,9 +20,10 @@ shotImpact(Probability):-
 
 /* DECISIONS */
 
-explore(Time,Time2,Size,Radius,MapWidth):-
+/*explore(Time,Time2,Size,Radius,MapWidth):-*/
+explore(Time,Time2):-
 	not(being_attacked(Time)),
-	areaCovered(Radius,Size,MapWidth),
+	/*areaCovered(Radius,Size,MapWidth),*/
     (choose_exploration(Time2, 2)
     -> jpl_call('sma.actionsBehaviours.customs.MountainPrologBehavior',heightExplore,[],R),
         (jpl_is_true(R)
