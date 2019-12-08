@@ -21,11 +21,11 @@ import sma.actionsBehaviours.TempSphereCast;
 import sma.actionsBehaviours.customs.MountainPrologBehavior;
 import sma.agents.FinalAgent;
 
+@Deprecated
 public class MountainAgent extends FinalAgent {
+	
+	private static final long serialVersionUID = 3296686054640523541L;
 
-	
-	private static final long serialVersionUID = 5215165765928961044L;
-	
 	public static final long PERIOD = 1000;
 	
 	public enum MoveMode {
@@ -58,8 +58,6 @@ public class MountainAgent extends FinalAgent {
 	protected void setup(){
 		super.setup();
 		
-		
-		
 		deploiment();
 		
 		offPoints = new ArrayList<>();
@@ -78,7 +76,6 @@ public class MountainAgent extends FinalAgent {
 		
 		
 		teleport(getRandomPosition());
-		
 	}
 	
 	public void goTo(Vector3f target){
@@ -100,6 +97,7 @@ public class MountainAgent extends FinalAgent {
 		}
 	}
 	
+	@Override
 	protected void deploiment(){
 		final Object[] args = getArguments();
 		if(args[0]!=null && args[1]!=null){
@@ -108,7 +106,7 @@ public class MountainAgent extends FinalAgent {
 			useProlog = ((boolean)args[1]);
 			
 			if(useProlog) {
-				addBehaviour(new MountainPrologBehavior(this,PERIOD));
+				addBehaviour(new MountainPrologBehavior(this, PERIOD));
 			} else {
 				addBehaviour(new DumbBehavior(this, PERIOD));
 			}
@@ -122,22 +120,5 @@ public class MountainAgent extends FinalAgent {
 			System.err.println("Malfunction during parameter's loading of agent"+ this.getClass().getName());
 			System.exit(-1);
 		}
-	}
-	
-	public void saveCSV(String ressourceFolderPath, String fileName, String content) {
-		//In case the user write wrong separator
-		ressourceFolderPath = ressourceFolderPath.replaceAll("(\\\\+|/+)", Matcher.quoteReplacement(File.separator));
-		if(!(ressourceFolderPath.lastIndexOf(File.separator)==ressourceFolderPath.length()-1)) ressourceFolderPath+=File.separator;
-		
-		try{
-		    PrintWriter writer = new PrintWriter(ressourceFolderPath+fileName+".csv", "UTF-8");
-		    writer.println(content);
-		    writer.close();
-		    System.out.println("Execution result saved in /ressources/simus/");
-		} catch (IOException e) {
-		  System.out.println(e);
-		  System.out.println("Experiment saving failed");
-		}
-		
 	}
 }

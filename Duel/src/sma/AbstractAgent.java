@@ -34,7 +34,7 @@ public class AbstractAgent extends Agent implements EnvironmentManager {
 	public static final int CLOSE_PRECISION = 100;
 	public static final int FAR_PRECISION = 1000;
 	
-	public static final int MAX_LIFE = 1;
+	public static final int MAX_LIFE = 6;
 	public static final int SHOT_DAMAGE = 2;
 	
 	

@@ -1,18 +1,26 @@
 package sma.agents;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
 
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 
 import env.jme.Environment;
 import env.jme.NewEnv;
+import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.TickerBehaviour;
 import sma.AbstractAgent;
 import sma.InterestPoint;
 import sma.actionsBehaviours.DumbBehavior;
 import sma.actionsBehaviours.ExploreBehavior;
 import sma.actionsBehaviours.HuntBehavior;
-import sma.actionsBehaviours.PrologBehavior;
 import sma.actionsBehaviours.TempSphereCast;
 
 public class FinalAgent extends AbstractAgent{
@@ -38,6 +46,7 @@ public class FinalAgent extends AbstractAgent{
 	public HuntBehavior hunt;
 	
 	public boolean useProlog;
+	public Class<? extends Behaviour> myType;
 	
 	public int life;
 	public long lastHit;
@@ -96,13 +105,28 @@ public class FinalAgent extends AbstractAgent{
 	
 	protected void deploiment(){
 		final Object[] args = getArguments();
-		if(args[0]!=null && args[1]!=null){
-			
+		if(args[0]!=null && args[1]!=null) {
 			
 			useProlog = ((boolean)args[1]);
+			if (args.length > 2)
+				myType = (Class<? extends Behaviour>) args[2];
 			
 			if(useProlog){
-				addBehaviour(new PrologBehavior(this,PERIOD));
+				System.out.println(myType.toString());
+				try {
+					Constructor<?> constructor = myType.getDeclaredConstructors()[0];
+					Behaviour myBehaviour = (Behaviour) constructor.newInstance(this, PERIOD);
+					addBehaviour(myBehaviour);
+				} catch (SecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				//addBehaviour(new PrologBehavior(this,PERIOD));
 			}else{
 				addBehaviour(new DumbBehavior(this, PERIOD));
 			}
@@ -118,5 +142,30 @@ public class FinalAgent extends AbstractAgent{
 		}
 	}
 	
+	public void saveCSV(String ressourceFolderPath, String fileName, String content) {
+		//In case the user write wrong separator
+		ressourceFolderPath = ressourceFolderPath.replaceAll("(\\\\+|/+)", Matcher.quoteReplacement(File.separator));
+		if(!(ressourceFolderPath.lastIndexOf(File.separator)==ressourceFolderPath.length()-1)) ressourceFolderPath+=File.separator;
+		
+		try{
+			File file = new File(ressourceFolderPath+fileName+".csv");
+			if (file.getParentFile() != null)
+				file.getParentFile().mkdirs();
+			file.createNewFile();
+			
+			FileOutputStream fos = new FileOutputStream(file, true);
+			PrintWriter writer = new PrintWriter(fos);
+			
+		    //PrintWriter writer = new PrintWriter(ressourceFolderPath+fileName+".csv", "UTF-8");
+		    writer.println(content);
+		    writer.close();
+		    fos.close();
+		    System.out.println("Execution result saved in '" + ressourceFolderPath + "'");
+		} catch (IOException e) {
+		  System.out.println(e);
+		  System.out.println("Experiment saving failed");
+		}
+		
+	}
 	
 }

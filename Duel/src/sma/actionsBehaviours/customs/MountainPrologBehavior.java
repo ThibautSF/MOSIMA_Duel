@@ -15,6 +15,7 @@ import sma.AbstractAgent;
 import sma.InterestPoint;
 import sma.actionsBehaviours.*;
 import sma.agents.FinalAgent;
+import sma.agents.customs.MountainAgent;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -36,11 +37,12 @@ public class MountainPrologBehavior extends TickerBehaviour {
 	public static final Class<?> DEFAULT_EXPLORE_BEHAVIOR = MountainBehavior.class;
 
 	public static Situation sit;
+	private int lastLife = -1;
 
 
 	public MountainPrologBehavior(Agent a, long period) {
 		super(a, period);
-		agent = (FinalAgent)((AbstractAgent)a);
+		agent = (FinalAgent)((AbstractAgent) a);
 		exploreBehavior = DEFAULT_EXPLORE_BEHAVIOR;
 	}
 
@@ -48,61 +50,83 @@ public class MountainPrologBehavior extends TickerBehaviour {
 
 	@Override
 	protected void onTick() {
-		try {
-			String prolog = "consult('./ressources/prolog/duel/mountainAgentRequete.pl')";
-
-			if (!Query.hasSolution(prolog)) {
-				System.out.println("Cannot open file " + prolog);
+		sit = Situation.getCurrentSituation(agent);
+		if (sit.victory) {
+			//Victory
+			System.out.println("victory");
+		} else if (sit.life <= 0) {
+			//Loose
+			System.out.println("i loose");
+			//NOT WORKING
+		} else {
+			
+			if (sit.enemyInSight) {
+				System.out.println("I see " + sit.enemy);
+				agent.saveCSV("ressources/learningBase/vision/", "ennemy_vision_historic", sit.toCSVFile());
 			}
-			else {
-				sit = Situation.getCurrentSituation(agent);
-				List<String> behavior = Arrays.asList("explore", "hunt", "attack");
-				ArrayList<Object> terms = new ArrayList<Object>();
-
-				for (String b : behavior) {
-					terms.clear();
-					// Get parameters 
-					if (b.equals("explore")) {
-						terms.add(sit.timeSinceLastShot);
-						int time = (int) Math.max(0, Math.min(Integer.MAX_VALUE,(System.currentTimeMillis() - dateLastChooseExploration)));
-						//System.out.println(time);
-						terms.add(time);
-						terms.add(EXPLORE_IDLE_MIN);
-						/*
-						terms.add(((ExploreBehavior.prlNextOffend)?sit.offSize:sit.defSize ));
-						terms.add(InterestPoint.INFLUENCE_ZONE);
-						terms.add(NewEnv.MAX_DISTANCE);
-						*/
-					}
-					else if (b.equals("hunt")) {
-						terms.add(sit.life);
-						terms.add(sit.timeSinceLastShot);
-						terms.add(sit.offSize);
-						terms.add(sit.defSize);
-						terms.add(InterestPoint.INFLUENCE_ZONE);
-						terms.add(NewEnv.MAX_DISTANCE);
-						terms.add(sit.enemyInSight);
-					}else if(b.equals("attack")){
-						//terms.add(sit.life);
-						terms.add(sit.enemyInSight);
-						//terms.add(sit.impactProba);
-					}
-					else { // RETREAT
-						terms.add(sit.life);
-						terms.add(sit.timeSinceLastShot);
-					}
-
-					String query = prologQuery(b, terms);
-					if (Query.hasSolution(query)) {
-						//System.out.println("has solution");
-						setNextBehavior();
-
+			
+			if(lastLife > sit.life) {
+				System.out.println("Was shooted last tick");
+				agent.saveCSV("ressources/learningBase/shoot/", "shoot_recieved_historic", sit.toCSVFile());
+			}
+			lastLife = sit.life;
+			
+			try {
+				String prolog = "consult('./ressources/prolog/duel/mountainAgentRequete.pl')";
+	
+				if (!Query.hasSolution(prolog)) {
+					System.out.println("Cannot open file " + prolog);
+				}
+				else {
+					
+					List<String> behavior = Arrays.asList("explore", "hunt", "attack");
+					ArrayList<Object> terms = new ArrayList<Object>();
+	
+					for (String b : behavior) {
+						terms.clear();
+						// Get parameters 
+						if (b.equals("explore")) {
+							terms.add(sit.timeSinceLastShot);
+							int time = (int) Math.max(0, Math.min(Integer.MAX_VALUE,(System.currentTimeMillis() - dateLastChooseExploration)));
+							//System.out.println(time);
+							terms.add(time);
+							terms.add(EXPLORE_IDLE_MIN);
+							/*
+							terms.add(((ExploreBehavior.prlNextOffend)?sit.offSize:sit.defSize ));
+							terms.add(InterestPoint.INFLUENCE_ZONE);
+							terms.add(NewEnv.MAX_DISTANCE);
+							*/
+						}
+						else if (b.equals("hunt")) {
+							terms.add(sit.life);
+							terms.add(sit.timeSinceLastShot);
+							terms.add(sit.offSize);
+							terms.add(sit.defSize);
+							terms.add(InterestPoint.INFLUENCE_ZONE);
+							terms.add(NewEnv.MAX_DISTANCE);
+							terms.add(sit.enemyInSight);
+						}else if(b.equals("attack")){
+							//terms.add(sit.life);
+							terms.add(sit.enemyInSight);
+							//terms.add(sit.impactProba);
+						}
+						else { // RETREAT
+							terms.add(sit.life);
+							terms.add(sit.timeSinceLastShot);
+						}
+	
+						String query = prologQuery(b, terms);
+						if (Query.hasSolution(query)) {
+							//System.out.println("has solution");
+							setNextBehavior();
+	
+						}
 					}
 				}
+			}catch(Exception e) {
+				System.err.println("Behaviour file for Prolog agent not found");
+				System.exit(0);
 			}
-		}catch(Exception e) {
-			System.err.println("Behaviour file for Prolog agent not found");
-			System.exit(0);
 		}
 	}
 
@@ -175,19 +199,21 @@ public class MountainPrologBehavior extends TickerBehaviour {
 	
 	public static void executeLastExplore() {
 		//System.out.println("Execute last " + exploreBehavior);
-		if (exploreBehavior == null)
-			nextBehavior = DEFAULT_EXPLORE_BEHAVIOR;
-		else
-			nextBehavior = exploreBehavior;
+		if (agent.currentBehavior == null) {
+			if (exploreBehavior == null)
+				nextBehavior = DEFAULT_EXPLORE_BEHAVIOR;
+			else
+				nextBehavior = exploreBehavior;
+		}
 	}
 
 	public static void executeHunt() {
-		//System.out.println("hunt");
+		System.out.println("hunt");
 		nextBehavior = HuntBehavior.class;
 	}
 
 	public static void executeAttack() {
-		//System.out.println("attack");
+		System.out.println("attack");
 		nextBehavior = Attack.class;
 	}
 

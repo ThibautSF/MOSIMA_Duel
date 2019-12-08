@@ -14,6 +14,8 @@ import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
+import sma.actionsBehaviours.PrologBehavior;
+import sma.actionsBehaviours.customs.MountainPrologBehavior;
 import sma.agents.FinalAgent;
 import sma.agents.customs.MountainAgent;
 
@@ -106,25 +108,38 @@ public class Principal {
 		ContainerController c;
 		String agentName;
 		List<AgentController> agentList=new ArrayList<AgentController>();
-		
-		
-		
+
 		c = containerList.get("container0");
+		
+		/**/
 		agentName="Player1";
 		try {
-			Object[] objtab=new Object[]{env, true};//used to give informations to the agent (the behaviours to trigger)
-			AgentController	ag=c.createNewAgent(agentName,MountainAgent.class.getName(),objtab);
+			Object[] objtab=new Object[]{env, true, MountainPrologBehavior.class};//used to give informations to the agent (the behaviours to trigger)
+			AgentController	ag=c.createNewAgent(agentName,FinalAgent.class.getName(),objtab);
 			agentList.add(ag);
 			System.out.println(agentName+" launched");
 			
 		} catch (StaleProxyException e) {
 			e.printStackTrace();
 		}
+		/**/
 		
 		/**
 		agentName="Dummy";
 		try {
 			Object[] objtab=new Object[]{env, false};//used to give informations to the agent
+			AgentController	ag=c.createNewAgent(agentName,FinalAgent.class.getName(),objtab);
+			agentList.add(ag);
+			System.out.println(agentName+" launched");
+		} catch (StaleProxyException e) {
+			e.printStackTrace();
+		}
+		/**/
+		
+		/**/
+		agentName="Player2";
+		try {
+			Object[] objtab=new Object[]{env, true, PrologBehavior.class};//used to give informations to the agent
 			AgentController	ag=c.createNewAgent(agentName,FinalAgent.class.getName(),objtab);
 			agentList.add(ag);
 			System.out.println(agentName+" launched");

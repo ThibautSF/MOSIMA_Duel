@@ -4,7 +4,7 @@ explore_points(OffSize,DefSize):-
 	OffSize>=2*DefSize. /* true if search for defensive */
 
 being_attacked(Time):-
-	Time<10.
+	Time<10*1000.
 
 choose_exploration(T,D):-
     T>D*1000.
