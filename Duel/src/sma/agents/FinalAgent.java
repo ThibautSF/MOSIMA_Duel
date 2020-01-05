@@ -46,7 +46,7 @@ public class FinalAgent extends AbstractAgent{
 	public HuntBehavior hunt;
 	
 	public boolean useProlog;
-	public Class<? extends Behaviour> myType;
+	public Class myType;
 	
 	public int life;
 	public long lastHit;
@@ -109,7 +109,7 @@ public class FinalAgent extends AbstractAgent{
 			
 			useProlog = ((boolean)args[1]);
 			if (args.length > 2)
-				myType = (Class<? extends Behaviour>) args[2];
+				myType = (Class) args[2];
 			
 			if(useProlog){
 				System.out.println(myType.toString());

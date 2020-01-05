@@ -17,6 +17,7 @@ import jade.wrapper.StaleProxyException;
 import sma.actionsBehaviours.PrologBehavior;
 import sma.actionsBehaviours.customs.MountainPrologBehavior;
 import sma.agents.FinalAgent;
+import sma.agents.customs.CustomAgent;
 import sma.agents.customs.MountainAgent;
 
 
@@ -30,9 +31,9 @@ public class Principal {
 	public static void main(String[] args){
 
 		//0) Create the environment
-		env = NewEnv.launchRandom(64);
-		//env = Environment.launch("circleMap2");
-		//env = Environment.launch("circleMap3");
+		//env = NewEnv.launchRandom(64);
+		//env = NewEnv.launch("circleMap2");
+		env = NewEnv.launch("circleMap3");
 		emptyPlatform(containerList);
 
 		//2) create agents and add them to the platssSSSform.
@@ -111,11 +112,24 @@ public class Principal {
 
 		c = containerList.get("container0");
 		
-		/**/
+		/**
 		agentName="Player1";
 		try {
 			Object[] objtab=new Object[]{env, true, MountainPrologBehavior.class};//used to give informations to the agent (the behaviours to trigger)
 			AgentController	ag=c.createNewAgent(agentName,FinalAgent.class.getName(),objtab);
+			agentList.add(ag);
+			System.out.println(agentName+" launched");
+			
+		} catch (StaleProxyException e) {
+			e.printStackTrace();
+		}
+		/**/
+		
+		/**/
+		agentName="Player1";
+		try {
+			Object[] objtab=new Object[]{env, true, MountainPrologBehavior.class};//used to give informations to the agent (the behaviours to trigger)
+			AgentController	ag=c.createNewAgent(agentName,CustomAgent.class.getName(),objtab);
 			agentList.add(ag);
 			System.out.println(agentName+" launched");
 			

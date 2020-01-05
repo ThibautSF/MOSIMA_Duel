@@ -64,6 +64,7 @@ import sma.actionsBehaviours.LegalActions;
 import sma.actionsBehaviours.LegalActions.LegalAction;
 import sma.actionsBehaviours.LegalActions.Orientation;
 import sma.actionsBehaviours.PrologBehavior;
+import sma.actionsBehaviours.customs.MountainPrologBehavior;
 import sma.agents.FinalAgent;
 
 
@@ -391,7 +392,7 @@ public class NewEnv extends SimpleApplication {
 			player.getControl(PlayerControl.class).teleport(dest);;
 			
 		}
-		System.out.println("moveTo Error : the agent "+agent+" doesn't exist.");
+		//System.out.println("moveTo Error : the agent "+agent+" doesn't exist.");
 	}
 	
 	public synchronized void stopMoving(String agent){
@@ -479,10 +480,17 @@ public class NewEnv extends SimpleApplication {
 						System.out.println("Simulation done");
 						
 						if(!enemy.equals("Player1")){
-							PrologBehavior.sit.victory = true;
+							//PrologBehavior.sit.victory = true;
+							//MountainPrologBehavior.sit.victory = true;
 						}
 						
 						saveCSV();
+						Situation final_sit = MountainPrologBehavior.sit;
+						if (final_sit != null) {
+							String path = "ressources/learningBase/" + (final_sit.victory ? "victory" : "defeat") + "/";
+							MountainPrologBehavior.agent.saveCSV(path, "historic", final_sit.toCSVFile());
+						}
+						
 						System.exit(0);
 					}
 

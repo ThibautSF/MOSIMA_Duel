@@ -116,6 +116,7 @@ public class MountainPrologBehavior extends TickerBehaviour {
 						}
 	
 						String query = prologQuery(b, terms);
+						//System.out.println(nextBehavior);
 						if (Query.hasSolution(query)) {
 							//System.out.println("has solution");
 							setNextBehavior();
@@ -141,7 +142,7 @@ public class MountainPrologBehavior extends TickerBehaviour {
 			agent.removeBehaviour(agent.currentBehavior);
 		}
 
-		if (nextBehavior == ExploreBehavior.class){
+		if (nextBehavior == MyExploreBehavior.class){
 			ExploreBehavior ex = new ExploreBehavior(agent, FinalAgent.PERIOD);
 			agent.addBehaviour(ex);
 			agent.currentBehavior = ex;
@@ -185,7 +186,7 @@ public class MountainPrologBehavior extends TickerBehaviour {
 
 	public static void executeExplore() {
 		System.out.println("explore");
-		nextBehavior = ExploreBehavior.class;
+		nextBehavior = MyExploreBehavior.class;
 		dateLastChooseExploration = System.currentTimeMillis();
 		exploreBehavior = nextBehavior;
 	}
@@ -214,6 +215,8 @@ public class MountainPrologBehavior extends TickerBehaviour {
 
 	public static void executeAttack() {
 		System.out.println("attack");
+		System.out.println(sit.enemyInSight);
+		System.out.println(sit.enemy);
 		nextBehavior = Attack.class;
 	}
 

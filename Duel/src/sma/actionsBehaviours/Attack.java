@@ -8,6 +8,7 @@ import env.jme.Situation;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
 import sma.AbstractAgent;
+import sma.actionsBehaviours.customs.MountainPrologBehavior;
 import sma.agents.FinalAgent;
 
 public class Attack extends TickerBehaviour{
@@ -31,7 +32,7 @@ public class Attack extends TickerBehaviour{
 		lastPosition = agent.getEnemyLocation(enemy);
 		lastTimeSeen = System.currentTimeMillis();
 		openFire = false;
-		System.out.println("Player Attack");
+		System.out.println(a.getLocalName()+" Attack");
 	}
 
 	
@@ -39,7 +40,7 @@ public class Attack extends TickerBehaviour{
 	@Override
 	protected void onTick() {
 		
-		askForFirePermission();
+		askForFirePermission(agent);
 	
 		agent.goTo(lastPosition);
 		
@@ -67,10 +68,18 @@ public class Attack extends TickerBehaviour{
 		}
 	}
 	
-	public static void askForFirePermission(){
-		String query = "toOpenFire("
+	public static void askForFirePermission(FinalAgent a){
+		String query;
+		
+		if(a.myType == MountainPrologBehavior.class) {
+			query = "toOpenFire("
+					+MountainPrologBehavior.sit.enemyInSight +","
+					+MountainPrologBehavior.sit.impactProba+")";
+		} else {
+			query = "toOpenFire("
 					+PrologBehavior.sit.enemyInSight +","
 					+PrologBehavior.sit.impactProba+")";
+		}
 		
 		openFire = Query.hasSolution(query);
 	}
